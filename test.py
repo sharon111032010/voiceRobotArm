@@ -5,6 +5,7 @@ robot = NiryoRobot("192.168.0.4")  # connect to Niryo arm by socket
 
 robot.calibrate_auto()  # 動作校正 找每個馬達的零點 /確認 關節位置 
 robot.update_tool() #更新 機械手臂上裝的是哪個爪子
+robot.clear_collision_detected()  # 清除碰撞狀態
 robot.move_to_home_pose() #回到預設安全手勢
 #規範 X  Y  Z可以移動的範圍
 def move_X(x:float):
@@ -45,26 +46,68 @@ pitch = 1.57 # 爪具的上下軸
 yaw = 0.0
 
 print("release_with_tool")
-#robot.release_with_tool()
+robot.release_with_tool()
 print("move pose")
 #				        x      y    z
-robot.move_linear_pose(0.2  , 0.0, 0.15, 0.0, 1.57, 0.0)
+robot.move_linear_pose(
+    move_X(0.2),
+    move_Y(0),
+    move_Z(0.15),
+    0,
+    1.57,
+    0
+)
 print("grasp_with_tool")
 robot.grasp_with_tool() # 控制爪具抓取
 
 time.sleep(0.5)
-print("move pose")
-robot.move_linear_pose(0.2, 0.1, 0.15, 0.0, 1.57, 0.0)
-robot.release_with_tool() # 控制爪具釋放
-
-init_pose=PoseObject(0.3, 0.0, 0.15, 0.0,0.1,0.1)
-robot.move_pose(init_pose)
 
 
-# 這是原點座標
+#夾取 下方正方形 
+
+# 取得目前位置
+pose = robot.get_pose()
+
+x = pose.x
+y = pose.y
+z = pose.z
+
+
+# 先到物體上方 5 cm
+robot.move_linear_pose(
+    x,
+    y,
+    z-0.03,
+    0,
+    1.57,
+    0
+)
+
+# 慢慢下降到物體高度
+robot.move_linear_pose(
+    x,
+    y,
+    z-0.05,
+    0,
+    1.57,
+    0
+)
+
+# 關閉夾爪
+robot.grasp_with_tool()
+
 time.sleep(0.5)
-robot.move_linear_pose(0.2  , 0.0, 0.15, 0.0, 1.57, 0.0)
-print("grasp_with_tool")
-robot.grasp_with_tool() # 控制爪具抓取
+
+
+# 抬起
+robot.move_linear_pose(
+    x,
+    y,
+    z-0.02,
+    0,
+    1.57,
+    0
+)
+
 
 robot.close_connection()
