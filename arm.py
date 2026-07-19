@@ -41,55 +41,57 @@ roll = 0.0   # 爪具自轉軸
 pitch = 1.57 # 爪具的上下軸
 yaw = 0.0
 
-# robot.move_linear_pose(x,y,z, roll, pitch,yaw)
-# robot.release_with_tool() #開爪子 
-# robot.grasp_with_tool() #關爪子 
-def moveOn(Mx=x,My=y,Mz=z):
-	robot.move_linear_pose(Mx,My,Mz,roll,pitch,yaw)
-def moveMz(Mz):
-	robot.move_linear_pose(x,y,Mz, roll, pitch,yaw)
-def moveMy(My):
-	robot.move_linear_pose(x,My,z, roll, pitch,yaw)
-def moveMx(Mx):
-	robot.move_linear_pose(Mx,y,z, roll, pitch,yaw)
+#
+	# robot.move_linear_pose(x,y,z, roll, pitch,yaw)
+	# robot.release_with_tool() #開爪子 
+	# robot.grasp_with_tool() #關爪子 
+	# def moveOn(Mx=x,My=y,Mz=z):
+	# 	robot.move_linear_pose(Mx,My,Mz,roll,pitch,yaw)
+	# def moveMz(Mz):
+	# 	robot.move_linear_pose(x,y,Mz, roll, pitch,yaw)
+	# def moveMy(My):
+	# 	robot.move_linear_pose(x,My,z, roll, pitch,yaw)
+	# def moveMx(Mx):
+# 	robot.move_linear_pose(Mx,y,z, roll, pitch,yaw)
 
 def close():
 	robot.grasp_with_tool()
 def open():
 	robot.release_with_tool()
 
-# print(joints)
-
 # 這是原點座標
-time.sleep(0.1)
-''' 前後 左右 上下 '''
 # robot.move_linear_pose(0.2  , 0.0, 0.15, 0.0, 1.57, 0.0)
+''' 前後 左右 上下 '''
 def setSide():
+# 設定回原點
     global x, y, z
     x = 0.2
     y = 0.0
     z = 0.15
+
 def go ():
+# 執行參數
 	robot.move_linear_pose(x,y,z, roll, pitch,yaw)
 def home ():
+# 回原點
 	robot.move_linear_pose(POINTX,POINTY,POINTZ, roll, pitch,yaw)
 def catch ():
-	robot.release_with_tool() #開爪子 
-	#robot.move_linear_pose(0.2  , 0.0, 0.15, 0.0, 1.57, 0.0)
-	#print("向下 0.15")
+	global z
 
-	robot.move_linear_pose(0.2  , 0.0, 0.10, 0.0, 1.57, 0.0)
-	print("向下 到10")
-	robot.grasp_with_tool()
-	print("上升到0.15")
-	robot.move_linear_pose(0.2  , 0.0, 0.15, 0.0, 1.57, 0.0)
-	robot.grasp_with_tool()
-def turnRight():
-	robot.move_linear_pose(0.2,0.1,0.15, 0.0,1.57,0.0)
-	robot.move_linear_pose(0.2,0.1,0.10, 0.0,1.57,0.0)
-def turnUp():
-	robot.move_linear_pose(0.2,0.1,0.13, 0.0,1.57,0.0)
+	open()
+	z=0.10
+	go()
+	close()
 
+	z=0.15
+	go()
+	close()
+
+	y = 0.1
+	go()
+
+	z = 0.10
+	go()
 home()
 # moveMz(0.10)
 catch()
