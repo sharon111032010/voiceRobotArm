@@ -4,6 +4,10 @@ from command.parser import CommandParser
 from robot.niryo_robot import NiryoController
 
 
+from pathlib import Path
+
+
+
 
 def main():
 
@@ -29,6 +33,16 @@ def main():
 
         text = voice.transcribe(
             "record.mp3"
+        )
+
+        BASE_DIR = Path(__file__).parent
+
+        # audio_file = BASE_DIR /"mp3"/ "record.mp3"
+        audio_file = BASE_DIR /"mp3"/ "6-5.mp3"
+
+
+        text = voice.transcribe(
+            str(audio_file)
         )
 
 
