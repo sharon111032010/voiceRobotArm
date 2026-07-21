@@ -1,7 +1,8 @@
 import torch
 import numpy as np
 from silero_vad import load_silero_vad
-
+import soundfile as sf
+from collections import deque
 
 class VADListener:
 
@@ -17,6 +18,8 @@ class VADListener:
 
         # Silero VAD 16kHz 固定 512 samples
         self.chunk_size = 512
+        # 保留約 256ms 的音訊
+        self.pre_buffer = deque(maxlen=8)
 
 
     def process(self, audio):
@@ -39,8 +42,10 @@ class VADListener:
                 continue
 
 
-            tensor = torch.from_numpy(chunk)
+            # 每個 frame 都先放進 pre-buffer
+            self.pre_buffer.append(chunk.copy())
 
+            tensor = torch.from_numpy(chunk)
 
             speech = self.model(
                 tensor,
@@ -50,14 +55,17 @@ class VADListener:
 
 
             # 有聲音
-            if speech > 0.5:
+            if speech > 0.6:
+
+                if not self.speaking:
+                    self.buffer.extend(self.pre_buffer)
 
                 self.buffer.append(chunk.copy())
 
                 self.speaking = True
-
+                
+                # 有聲音就重新計算靜音
                 self.silence = 0
-
 
 
             # 靜音
@@ -71,13 +79,15 @@ class VADListener:
                     # 5個512 frame
                     # 512 / 16000 = 32ms
                     # 5次約160ms
-                    if self.silence > 25:
+                    if self.silence > 40:
 
 
                         result = np.concatenate(
                             self.buffer
                         )
 
+                        # 寫入資料
+                        sf.write("debug.wav",result,16000)
 
                         self.buffer.clear()
 
@@ -85,9 +95,13 @@ class VADListener:
 
                         self.silence = 0
 
-
                         return result
+        return None
 
+    def reset(self):
+        self.buffer.clear()
+        self.speaking = False
+        self.silence = 0
 
 
         return None

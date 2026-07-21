@@ -6,6 +6,7 @@ from command.parser import CommandParser
 from robot.niryo_robot import NiryoRobot
 from voice.wake_word import WakeWordDetector
 
+import time
 
 mic = MicListener()
 
@@ -40,7 +41,14 @@ while True:
 
             print("已喚醒")
 
+            mic.clear()
+
             awake = True
+
+            for _ in range(3):
+                mic.read()
+
+            vad.reset()
 
         continue
 
@@ -91,3 +99,4 @@ while True:
 
         # 完成一次指令
         awake = False
+        mic.clear()

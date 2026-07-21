@@ -10,7 +10,7 @@ class MicListener:
         blocksize=1280
     ):
 
-        self.queue = queue.Queue()
+        self.queue = queue.Queue(maxsize=10)
 
         self.stream = sd.InputStream(
             samplerate=samplerate,
@@ -27,9 +27,11 @@ class MicListener:
         if status:
             print(status)
 
-        self.queue.put(
-            indata.copy()
-        )
+        if self.queue.full():
+
+            self.queue.get_nowait()
+
+        self.queue.put(indata.copy())
 
 
     def start(self):
@@ -47,7 +49,7 @@ class MicListener:
 
         self.stream.stop()
         self.stream.close()
-        
+
     def clear(self):
         while not self.queue.empty():
             try:
