@@ -4,6 +4,8 @@ from silero_vad import load_silero_vad
 import soundfile as sf
 from collections import deque
 
+import random
+
 class VADListener:
 
     def __init__(self):
@@ -87,7 +89,7 @@ class VADListener:
                         )
 
                         # 寫入資料
-                        sf.write("debug.wav",result,16000)
+                        sf.write("debug"+str(random.randint(0, 1000))+".wav" , result, 16000)
 
                         self.buffer.clear()
 
